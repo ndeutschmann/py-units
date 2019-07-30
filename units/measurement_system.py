@@ -9,12 +9,27 @@ An example of derived system is the HEP system, in which one has action (with de
 """
 # External imports
 from sympy import Matrix,det
+from math import log,exp
 
 # Internal imports
 from .physical_system import PhysicalQuantity,Dimension
 
 
 class MeasurementSystem:
+    """
+    TODO Comments about the matrix of the form
+    1      | 0 0 0 0
+    _________________
+    log(u1)|
+       .   |
+       .   |   Y
+       .   |
+    log(uN)|
+    where Y is the transfer matrix of the exponents and ui are the value of the defining quantities
+    cf log(Ui) = log(ui) + Yij log(U'j) = M.(1,log(U'j)
+
+
+    """
     def __init__(self,defining_quantities,physical_system):
         for q in defining_quantities:
             assert q.system == physical_system
@@ -27,7 +42,8 @@ class MeasurementSystem:
         self.physical_system = physical_system
 
         # Build the transfer matrix, check that it is invertible
-        self.matrix = Matrix([q.dimension for q in defining_quantities])
+        first_row = [1]+[0]*len(defining_quantities)
+        self.matrix = Matrix(first_row+[([log(q.value)]+q.dimension) for q in defining_quantities])
         assert det(self.matrix) != 0
         # Build the inverse transfer matrix
         self.inverse_matrix = self.matrix.inv()
@@ -47,14 +63,15 @@ class MeasurementQuantity(PhysicalQuantity):
         defining_quantity has a similar expression in terms of a value and the defining quantities of the underlying
         system
         """
-        underlying_value = self.value
-        underlying_dimension = Dimension([0]*len(self.dimension))
 
-        for i,q in enumerate(self.system.defining_quantities):
-            underlying_value *= q.value**self.dimension[i]
-            underlying_dimension = underlying_dimension + self.dimension[i]*q.dimension
+        underlying_vector = self.vector.transpose() * self.system.matrix
 
-        return PhysicalQuantity(underlying_value,underlying_dimension,self.system.physical_system,name=self.name)
+        return PhysicalQuantity(exp(underlying_vector[0]),underlying_vector[1:],self.system.physical_system,name=self.name)
+
+    def to_system(self,new_system):
+        new_vector = self.vector.transpose()* self.system.matrix * new_system.inverse_matrix
+        return PhysicalQuantity(exp(new_vector[0]), new_vector[1:], self.system.physical_system,
+                                name=self.name)
 
 def physical_measurement_system(physical_system):
     """Build a measurement system from the defining quantities of a physical system"""

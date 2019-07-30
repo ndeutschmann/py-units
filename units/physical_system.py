@@ -2,6 +2,8 @@
 '''
 
 from numbers import Number
+from math import log
+from sympy import Matrix
 
 class PhysicalSystem:
     """A PhysicalSystem is the abstract data of a number of a number of quantities and a list of physical constants which define what 1 unit is in this system
@@ -14,20 +16,9 @@ class PhysicalSystem:
 
         self.quantities = QU_strings
 
-class Dimension(tuple):
+class Dimension(Matrix):
     """List of exponents that express the dimension of a quantity in a given system. Can be added and subtracted together, and multiplied or divided by numbers"""
-    def __add__(self,other):
-        return Dimension([x+y for x,y in zip(self,other)])
-    def __sub__(self, other):
-        return Dimension([x - y for x, y in zip(self, other)])
-    def __neg__(self):
-        return Dimension([-x for x in self])
-    def __mul__(self, other):
-        return Dimension(x*other for x in self)
-    def __rmul__(self, other):
-        return self.__mul__(other)
-    def __truediv__(self,other):
-        return Dimension(x/other for x in self)
+    pass
 
 class PhysicalQuantity:
     """A PhysicalQuantity is a quantity expressed in a PhysicalSystem. It is the data of a physical dimension(a product of powers of elementary quantities expressed as a list of floats) and of a value (float)"""
@@ -40,6 +31,9 @@ class PhysicalQuantity:
 
         assert len(dimension) == len(system.quantities)
         self.dimension = Dimension(dimension)
+
+        # With the use of the vector notation, the value and dimension entries are probably useless
+        self.vector = Matrix([log(self.value)]+list(dimension))
 
         self.name=name
 
