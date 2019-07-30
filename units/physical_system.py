@@ -6,13 +6,13 @@ from numbers import Number
 class PhysicalSystem:
     """A PhysicalSystem is the abstract data of a number of a number of quantities and a list of physical constants which define what 1 unit is in this system
     """
-    def __init__(self,quantities):
+    def __init__(self,quantities_and_units):
         """quantities_and_units: list of (str,str)"""
-        for q, u in quantities:
-            assert isinstance(q,str)
-            assert isinstance(u,str)
+        QU_strings = []
+        for q, u in quantities_and_units:
+            QU_strings.append((str(q),str(u)))
 
-        self.quantities = quantities
+        self.quantities = QU_strings
 
 class Dimension(tuple):
     """List of exponents that express the dimension of a quantity in a given system. Can be added and subtracted together, and multiplied or divided by numbers"""
@@ -31,7 +31,7 @@ class Dimension(tuple):
 
 class PhysicalQuantity:
     """A PhysicalQuantity is a quantity expressed in a PhysicalSystem. It is the data of a physical dimension(a product of powers of elementary quantities expressed as a list of floats) and of a value (float)"""
-    def __init__(self,value,dimension,system):
+    def __init__(self,value,dimension,system,name=None):
         assert isinstance(value,Number)
         self.value = value
 
@@ -40,6 +40,8 @@ class PhysicalQuantity:
 
         assert len(dimension) == len(system.quantities)
         self.dimension = Dimension(dimension)
+
+        self.name=name
 
 
 
@@ -74,3 +76,20 @@ class PhysicalQuantity:
         assert other.system == self.system
         assert self.dimension == other.dimension
         return PhysicalQuantity(self.value - other.value, self.dimension, self.system)
+
+    def __str__(self,show_quantities=False):
+        ustr = str(self.value)+" "
+        qstr = ""
+        for i, qu in enumerate(self.system.quantities):
+            ustr += "{}**{}".format(qu[1],self.dimension[i])
+            qstr += "[{}]**{}".format(qu[0], self.dimension[i])
+
+        if self.name is not None:
+            ustr= self.name+" = "+ustr
+
+        if show_quantities:
+            ustr += " ("+qstr+")"
+
+        return ustr
+
+
