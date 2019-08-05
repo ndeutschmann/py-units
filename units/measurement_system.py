@@ -119,6 +119,11 @@ class MeasurementSystem(PhysicalSystem):
         else:
             raise TypeError("Cannot process this type of input")
 
+    #TODO add derived_units attribute that uses the derived unit name as a shorthand for
+    #TODO some combinations of base units (eg: Newton = kg*m/s**2)
+    #TODO build_value_string would then first look for the unit in a dict whose keys are tuple(dimension)
+    #TODO and if found use the name
+
 
 class MeasurementQuantity(PhysicalQuantity):
     """A MeasurementQuantity is a quantity expressed in a MeasurementSystem. It is the data of a physical dimension(a product of powers of elementary quantities expressed as a list of floats) and of a value (float)"""
