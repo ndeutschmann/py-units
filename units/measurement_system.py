@@ -71,12 +71,16 @@ class MeasurementSystem(PhysicalSystem):
             assert self.physical_system == q.system, "All quantities must have the same underlying system"
 
         # Build the transfer matrix, check that it is invertible
-        first_row = [1]+[0]*len(defining_quantities)
-        self.matrix = Matrix([first_row]+[([log(q.value)]+list(q.dimension)) for Q,u,q in defining_quantities])
+        first_row = Matrix([1]+[0]*len(defining_quantities))
+        log_qs = Matrix([log(q.value) for Q,u,q in defining_quantities])
+        Y = Matrix([list(q.dimension) for Q, u, q in defining_quantities])
+        self.matrix = Y.col_insert(0,log_qs).row_insert(0,first_row.transpose())
+        Yinv = Y.inv()
         assert det(self.matrix) != 0
         # Build the inverse transfer matrix
-        # TODO Exploit the block structure to avoid replacing the integer/rational block by floats
-        self.inverse_matrix = self.matrix.inv()
+        # We exploit the block structure to avoid mixing floats of the logs with potential int/rationals
+        # that are in the exponent matrix Y/Yinv
+        self.inverse_matrix = Yinv.col_insert(0,-Yinv*log_qs).row_insert(0,first_row.transpose())
 
     def one_unit(self,quantity):
         """Take a quantity and return a MeasurementQuantity in this system with the same dimension
