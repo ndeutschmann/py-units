@@ -14,11 +14,28 @@ class PhysicalSystem:
         for q, u in quantities_and_units:
             QU_strings.append((str(q),str(u)))
 
-        self.quantities = QU_strings
+        self.quantity_definitions = QU_strings
+        self.base_quantities = self._generate_base_quantities()
+
+    def __call__(self,value,dimension,name=None):
+        """Generate a quantity in this system with a given value and dimension"""
+        return PhysicalQuantity(value,dimension,self,name=name)
+
+    def _generate_base_quantities(self):
+        """Generate the list of PhysicalQuantities that correspond to 1 of each of the base units"""
+        base_quantities = []
+        for i,qu in enumerate(self.quantity_definitions):
+            dimension = [0]*len(self.quantity_definitions)
+            dimension[i] = 1
+            base_quantities.append(PhysicalQuantity(1., dimension, self))
+        return base_quantities
+
 
 class Dimension(Matrix):
     """List of exponents that express the dimension of a quantity in a given system. Can be added and subtracted together, and multiplied or divided by numbers"""
-    pass
+    def __init__(self,*args,**kwargs):
+        """Check that it has only one line"""
+        assert self.shape[1] == 1,"Dimensions must be a one-dimensional vector"
 
 class PhysicalQuantity:
     """A PhysicalQuantity is a quantity expressed in a PhysicalSystem. It is the data of a physical dimension(a product of powers of elementary quantities expressed as a list of floats) and of a value (float)"""
@@ -29,7 +46,7 @@ class PhysicalQuantity:
         assert isinstance(system,PhysicalSystem)
         self.system = system
 
-        assert len(dimension) == len(system.quantities)
+        assert len(dimension) == len(system.quantity_definitions)
         self.dimension = Dimension(dimension)
 
         # With the use of the vector notation, the value and dimension entries are probably useless
@@ -61,6 +78,10 @@ class PhysicalQuantity:
         assert isinstance(other,Number)
         return PhysicalQuantity(other/self.value,-self.dimension,self.system)
 
+    def __pow__(self, power):
+        assert isinstance(power,Number),"The exponent must be a number"
+        return PhysicalQuantity(self.value**power, power*self.dimension, self.system)
+
     def __add__(self, other):
         assert other.system == self.system
         assert self.dimension == other.dimension
@@ -71,19 +92,33 @@ class PhysicalQuantity:
         assert self.dimension == other.dimension
         return PhysicalQuantity(self.value - other.value, self.dimension, self.system)
 
-    def __str__(self,show_quantities=False):
-        ustr = str(self.value)+" "
+    def __str__(self,show_dimension=False):
+        ustr = str(self.value)
         qstr = ""
-        for i, qu in enumerate(self.system.quantities):
-            ustr += "{}**{}".format(qu[1],self.dimension[i])
-            qstr += "[{}]**{}".format(qu[0], self.dimension[i])
+        for i, qu in enumerate(self.system.quantity_definitions):
+            if self.dimension[i]:
+                ustr += " {}^{}".format(qu[1],self.dimension[i])
+                qstr += "[{}]^{}".format(qu[0], self.dimension[i])
 
         if self.name is not None:
             ustr= self.name+" = "+ustr
 
-        if show_quantities:
+        if show_dimension:
             ustr += " ("+qstr+")"
 
         return ustr
+
+    def __repr__(self):
+        qstr = ""
+        for i, qu in enumerate(self.system.quantity_definitions):
+            if self.dimension[i]:
+                qstr += "[{}]^{}".format(qu[0], self.dimension[i])
+
+        qstr = "({})".format(qstr)
+
+        if self.name is not None:
+            qstr= self.name+" "+qstr
+
+        return "{} {}".format(object.__repr__(self),qstr)
 
 

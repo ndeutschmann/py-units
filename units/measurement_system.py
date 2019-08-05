@@ -12,10 +12,10 @@ from sympy import Matrix,det
 from math import log,exp
 
 # Internal imports
-from .physical_system import PhysicalQuantity
+from .physical_system import PhysicalQuantity,PhysicalSystem
 
 
-class MeasurementSystem:
+class MeasurementSystem(PhysicalSystem):
     """
     TODO Comments about the matrix of the form
     1      | 0 0 0 0
@@ -33,20 +33,23 @@ class MeasurementSystem:
     def __init__(self,defining_quantities,physical_system):
         for q in defining_quantities:
             assert q.system == physical_system
+            assert q.name is not None, "Defining quantities must be named"
 
         # No zero value can be used
         assert all([q.value != 0 for q in defining_quantities])
 
         # Load data
-        self.defining_quantities = defining_quantities
+        self.quantity_definitions = defining_quantities
         self.physical_system = physical_system
 
         # Build the transfer matrix, check that it is invertible
         first_row = [1]+[0]*len(defining_quantities)
-        self.matrix = Matrix(first_row+[([log(q.value)]+q.dimension) for q in defining_quantities])
+        self.matrix = Matrix([first_row]+[([log(q.value)]+list(q.dimension)) for q in defining_quantities])
         assert det(self.matrix) != 0
         # Build the inverse transfer matrix
         self.inverse_matrix = self.matrix.inv()
+        # Build the base quantities
+        self.base_quantities=self._generate_base_quantities()
 
     def one_unit(self,quantity):
         """Take a quantity and return a MeasurementQuantity in this system with the same dimension
@@ -62,6 +65,15 @@ class MeasurementSystem:
         else:
             converted_quantity = quantity.to_system(self)
             return MeasurementQuantity(1,converted_quantity.dimension,self)
+
+    def _generate_base_quantities(self):
+        """Generate the list of MeasurementQuantities that correspond to 1 of each of the base units"""
+        base_quantities = []
+        for i,qu in enumerate(self.quantity_definitions):
+            dimension = [0]*len(self.quantity_definitions)
+            dimension[i] = 1
+            base_quantities.append(MeasurementQuantity(1., dimension, self,self.quantity_definitions[i].name))
+        return base_quantities
 
 
 class MeasurementQuantity(PhysicalQuantity):
@@ -88,13 +100,27 @@ class MeasurementQuantity(PhysicalQuantity):
         return PhysicalQuantity(exp(new_vector[0]), new_vector[1:], self.system.physical_system,
                                 name=self.name)
 
+    def __repr__(self):
+        #TODO NEEDS IMPROVEMENT
+        if self.name is None:
+            return object.__repr__(self)
+        else:
+            return object.__repr__(self)+" "+str(self.name)
+
+    def __str__(self):
+        #TODO NEEDS IMPROVEMENT
+        if self.name is None:
+            return object.__str__(self)
+        else:
+            return str(self.name)
+
 def physical_measurement_system(physical_system):
     """Build a measurement system from the defining quantities of a physical system"""
-    N = len(physical_system.quantities)
+    N = len(physical_system.quantity_definitions)
     defining_quantities = []
-    for i,q in enumerate(physical_system.quantities):
+    for i,q in enumerate(physical_system.quantity_definitions):
         d = [0 if j != i else 1 for j in range(N) ]
-        defining_quantities.append(PhysicalQuantity(1,d,physical_system))
+        defining_quantities.append(PhysicalQuantity(1,d,physical_system,name=physical_system.quantity_definitions[i][1]))
 
     return MeasurementSystem(defining_quantities,physical_system)
 
