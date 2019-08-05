@@ -128,7 +128,22 @@ class MeasurementQuantity(PhysicalQuantity):
         return MeasurementQuantity(exp(new_vector[0]), new_vector[1:], new_system,
                                 name=self.name)
 
-
+# Allow system conversion when using the mother class algebraic operations
+def system_match_left(func):
+    def matched_func(left, right):
+        if not (isinstance(left, MeasurementQuantity) and isinstance(right, MeasurementQuantity)):
+            return func(left,right)
+        if left.system != right.system:
+            return func(left, right.to_system(left.system))
+        else:
+            return func(left, right)
+    return matched_func
+# Loop over algebraic functions and apply system convertor
+for f in ["__mul__", "__rmul__", "__truediv__", "__rtruediv__", "__add__", "__sub__"]:
+    setattr(MeasurementQuantity,
+            f,
+            system_match_left(getattr(PhysicalQuantity,f))
+            )
 
 def physical_measurement_system(physical_system):
     """Build a measurement system from the defining quantities of a physical system"""
