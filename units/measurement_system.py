@@ -31,6 +31,9 @@ class MeasurementSystem(PhysicalSystem):
 
     """
     def __init__(self,defining_quantities,physical_system):
+        #TODO The naming must be better handled ! A system similar to the physicalsystem must be taken to have names
+        #TODO for the quantities that are expressed within the system
+        #TODO Best would be to align the structure of defining_quantities better with the parent class
         for q in defining_quantities:
             assert q.system == physical_system
             assert q.name is not None, "Defining quantities must be named"
