@@ -15,13 +15,12 @@ class PhysicalSystem:
             QU_strings.append((str(q),str(u)))
 
         self.quantity_definitions = QU_strings
-        self.base_quantities = self._generate_base_quantities()
 
     def __call__(self,value,dimension,name=None):
         """Generate a quantity in this system with a given value and dimension"""
         return PhysicalQuantity(value,dimension,self,name=name)
 
-    def _generate_base_quantities(self):
+    def base_quantities(self):
         """Generate the list of PhysicalQuantities that correspond to 1 of each of the base units"""
         base_quantities = []
         for i,qu in enumerate(self.quantity_definitions):
@@ -92,33 +91,33 @@ class PhysicalQuantity:
         assert self.dimension == other.dimension
         return PhysicalQuantity(self.value - other.value, self.dimension, self.system)
 
-    def __str__(self,show_dimension=False):
+    def build_value_string(self):
         ustr = str(self.value)
-        qstr = ""
         for i, qu in enumerate(self.system.quantity_definitions):
             if self.dimension[i]:
                 ustr += " {}^{}".format(qu[1],self.dimension[i])
-                qstr += "[{}]^{}".format(qu[0], self.dimension[i])
+        return ustr
 
+    def build_quantity_string(self):
+        qstr = ""
+        for i, qu in enumerate(self.system.quantity_definitions):
+            if self.dimension[i]:
+                qstr += "[{}]^{}".format(qu[0], self.dimension[i])
+        return qstr
+
+    def __str__(self):
+        ustr = self.build_value_string()
         if self.name is not None:
             ustr= self.name+" = "+ustr
 
-        if show_dimension:
-            ustr += " ("+qstr+")"
+        qstr = self.build_quantity_string()
+        ustr += " ("+qstr+")"
 
         return ustr
 
     def __repr__(self):
-        qstr = ""
-        for i, qu in enumerate(self.system.quantity_definitions):
-            if self.dimension[i]:
-                qstr += "[{}]^{}".format(qu[0], self.dimension[i])
+        return "<{} {}>".format(self.__class__.__name__,self.build_value_string())
 
-        qstr = "({})".format(qstr)
 
-        if self.name is not None:
-            qstr= self.name+" "+qstr
-
-        return "{} {}".format(object.__repr__(self),qstr)
 
 
