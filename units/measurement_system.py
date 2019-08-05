@@ -106,6 +106,19 @@ class MeasurementSystem(PhysicalSystem):
             base_quantities.append(MeasurementQuantity(1., dimension, self,name=self.quantity_definitions[i][1]))
         return base_quantities
 
+    def __call__(self,*args,**kwargs):
+        """Calling a MeasurementSystem instance on:
+        - a MeasurementQuantity converts it to the system
+        No other option for now
+        """
+        if len(args)==1 and isinstance(args[0],MeasurementQuantity):
+            if self == args[0].system:
+                return args[0]
+            else:
+                return(args[0].to_system(self))
+        else:
+            raise TypeError("Cannot process this type of input")
+
 
 class MeasurementQuantity(PhysicalQuantity):
     """A MeasurementQuantity is a quantity expressed in a MeasurementSystem. It is the data of a physical dimension(a product of powers of elementary quantities expressed as a list of floats) and of a value (float)"""

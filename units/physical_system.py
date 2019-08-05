@@ -92,7 +92,7 @@ class PhysicalQuantity:
         return self.__class__(self.value - other.value, self.dimension, self.system)
 
     def build_value_string(self):
-        ustr = str(self.value)
+        ustr = "{0:e}".format(self.value)
         for i, qu in enumerate(self.system.quantity_definitions):
             if self.dimension[i]:
                 ustr += " {}^{}".format(qu[1],self.dimension[i])
