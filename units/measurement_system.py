@@ -30,29 +30,53 @@ class MeasurementSystem(PhysicalSystem):
 
 
     """
-    def __init__(self,defining_quantities,physical_system):
+    def __init__(self,defining_quantities):
+        """
+
+        :param defining_quantities: tuples of length 3: (quantity_name unit_name,PhysicalQuantity)
+        All quantities must share the same system
+        TODO option to build the quantity name from the underlying system quantity_string
+        """
         #TODO The naming must be better handled ! A system similar to the physicalsystem must be taken to have names
         #TODO for the quantities that are expressed within the system
         #TODO Best would be to align the structure of defining_quantities better with the parent class
-        for q in defining_quantities:
-            assert q.system == physical_system
-            assert q.name is not None, "Defining quantities must be named"
+
+        # TODO Check input structure
+        # system = None
+        # for Quq in defining_quantities:
+        #     if system is None:
+        #         system = Quq[2].system
+        #     else:
+        #         assert Quq[2].system == system
+        #         Quq[2].name = Quq[1]
+
+
 
         # No zero value can be used
-        assert all([q.value != 0 for q in defining_quantities])
+        assert all([Quq[2].value != 0 for Quq in defining_quantities])
 
         # Load data
-        self.quantity_definitions = defining_quantities
-        self.physical_system = physical_system
+        self.quantity_definitions = []
+        self.quantities = []
+        for Q, u, q in defining_quantities:
+            self.quantity_definitions.append((Q,u))
+            if isinstance(q,MeasurementQuantity):
+                self.quantities.append(q.underlying_quantity())
+            elif isinstance(q,PhysicalQuantity):
+                self.quantities.append(q)
+            else:
+                raise TypeError("Need quantities")
+        self.physical_system = self.quantities[0].system
+        for q in self.quantities:
+            assert self.physical_system == q.system, "All quantities must have the same underlying system"
 
         # Build the transfer matrix, check that it is invertible
         first_row = [1]+[0]*len(defining_quantities)
-        self.matrix = Matrix([first_row]+[([log(q.value)]+list(q.dimension)) for q in defining_quantities])
+        self.matrix = Matrix([first_row]+[([log(q.value)]+list(q.dimension)) for Q,u,q in defining_quantities])
         assert det(self.matrix) != 0
         # Build the inverse transfer matrix
+        # TODO Exploit the block structure to avoid replacing the integer/rational block by floats
         self.inverse_matrix = self.matrix.inv()
-        # Build the base quantities
-        self.base_quantities=self._generate_base_quantities()
 
     def one_unit(self,quantity):
         """Take a quantity and return a MeasurementQuantity in this system with the same dimension
@@ -69,13 +93,13 @@ class MeasurementSystem(PhysicalSystem):
             converted_quantity = quantity.to_system(self)
             return MeasurementQuantity(1,converted_quantity.dimension,self)
 
-    def _generate_base_quantities(self):
+    def base_quantities(self):
         """Generate the list of MeasurementQuantities that correspond to 1 of each of the base units"""
         base_quantities = []
         for i,qu in enumerate(self.quantity_definitions):
             dimension = [0]*len(self.quantity_definitions)
             dimension[i] = 1
-            base_quantities.append(MeasurementQuantity(1., dimension, self,self.quantity_definitions[i].name))
+            base_quantities.append(MeasurementQuantity(1., dimension, self,name=self.quantity_definitions[i][1]))
         return base_quantities
 
 
@@ -99,23 +123,12 @@ class MeasurementQuantity(PhysicalQuantity):
         return PhysicalQuantity(exp(underlying_vector[0]),underlying_vector[1:],self.system.physical_system,name=self.name)
 
     def to_system(self,new_system):
+        assert self.system.physical_system == new_system.physical_system
         new_vector = self.vector.transpose()* self.system.matrix * new_system.inverse_matrix
-        return PhysicalQuantity(exp(new_vector[0]), new_vector[1:], self.system.physical_system,
+        return MeasurementQuantity(exp(new_vector[0]), new_vector[1:], new_system,
                                 name=self.name)
 
-    def __repr__(self):
-        #TODO NEEDS IMPROVEMENT
-        if self.name is None:
-            return object.__repr__(self)
-        else:
-            return object.__repr__(self)+" "+str(self.name)
 
-    def __str__(self):
-        #TODO NEEDS IMPROVEMENT
-        if self.name is None:
-            return object.__str__(self)
-        else:
-            return str(self.name)
 
 def physical_measurement_system(physical_system):
     """Build a measurement system from the defining quantities of a physical system"""
@@ -123,7 +136,12 @@ def physical_measurement_system(physical_system):
     defining_quantities = []
     for i,q in enumerate(physical_system.quantity_definitions):
         d = [0 if j != i else 1 for j in range(N) ]
-        defining_quantities.append(PhysicalQuantity(1,d,physical_system,name=physical_system.quantity_definitions[i][1]))
+        quantity_definition = (
+            physical_system.quantity_definitions[i][0],
+            physical_system.quantity_definitions[i][1],
+            PhysicalQuantity(1, d, physical_system)
+        )
+        defining_quantities.append(quantity_definition)
 
-    return MeasurementSystem(defining_quantities,physical_system)
+    return MeasurementSystem(defining_quantities)
 

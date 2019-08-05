@@ -11,19 +11,19 @@ class PhysicalSystem:
     def __init__(self,quantities_and_units):
         """quantities_and_units: list of (str,str)"""
         QU_strings = []
-        for q, u in quantities_and_units:
-            QU_strings.append((str(q),str(u)))
+        for qu in quantities_and_units:
+            QU_strings.append((str(qu[0]),str(qu[1])))
 
         self.quantity_definitions = QU_strings
 
     def __call__(self,value,dimension,name=None):
         """Generate a quantity in this system with a given value and dimension"""
-        return PhysicalQuantity(value,dimension,self,name=name)
+        return self.PhysicalQuantity(value,dimension,self,name=name)
 
     def base_quantities(self):
         """Generate the list of PhysicalQuantities that correspond to 1 of each of the base units"""
         base_quantities = []
-        for i,qu in enumerate(self.quantity_definitions):
+        for i in range(len(self.quantity_definitions)):
             dimension = [0]*len(self.quantity_definitions)
             dimension[i] = 1
             base_quantities.append(PhysicalQuantity(1., dimension, self))
@@ -57,39 +57,39 @@ class PhysicalQuantity:
 
     def __mul__(self, other):
         if isinstance(other,Number):
-            return PhysicalQuantity(self.value*other,self.dimension,self.system)
+            return self.__class__(self.value*other,self.dimension,self.system)
         else:
             assert other.system == self.system
-            return PhysicalQuantity(self.value*other.value,self.dimension+other.dimension,self.system)
+            return self.__class__(self.value*other.value,self.dimension+other.dimension,self.system)
 
     def __rmul__(self, other):
         assert isinstance(other,Number)
-        return self.__mul__(other)
+        return self*other
 
     def __truediv__(self, other):
         if isinstance(other,Number):
-            return PhysicalQuantity(self.value/other,self.dimension,self.system)
+            return self.__class__(self.value/other,self.dimension,self.system)
         else:
             assert other.system == self.system
-            return PhysicalQuantity(self.value/other.value,self.dimension-other.dimension,self.system)
+            return self.__class__(self.value/other.value,self.dimension-other.dimension,self.system)
 
     def __rtruediv__(self, other):
         assert isinstance(other,Number)
-        return PhysicalQuantity(other/self.value,-self.dimension,self.system)
+        return self.__class__(other/self.value,-self.dimension,self.system)
 
     def __pow__(self, power):
         assert isinstance(power,Number),"The exponent must be a number"
-        return PhysicalQuantity(self.value**power, power*self.dimension, self.system)
+        return self.__class__(self.value**power, power*self.dimension, self.system)
 
     def __add__(self, other):
         assert other.system == self.system
         assert self.dimension == other.dimension
-        return PhysicalQuantity(self.value + other.value, self.dimension, self.system)
+        return self.__class__(self.value + other.value, self.dimension, self.system)
 
     def __sub__(self, other):
         assert other.system == self.system
         assert self.dimension == other.dimension
-        return PhysicalQuantity(self.value - other.value, self.dimension, self.system)
+        return self.__class__(self.value - other.value, self.dimension, self.system)
 
     def build_value_string(self):
         ustr = str(self.value)
