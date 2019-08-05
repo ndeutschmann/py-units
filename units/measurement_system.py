@@ -12,7 +12,7 @@ from sympy import Matrix,det
 from math import log,exp
 
 # Internal imports
-from .physical_system import PhysicalQuantity,Dimension
+from .physical_system import PhysicalQuantity
 
 
 class MeasurementSystem:
@@ -47,6 +47,21 @@ class MeasurementSystem:
         assert det(self.matrix) != 0
         # Build the inverse transfer matrix
         self.inverse_matrix = self.matrix.inv()
+
+    def one_unit(self,quantity):
+        """Take a quantity and return a MeasurementQuantity in this system with the same dimension
+        and with value 1 unit"""
+        # Check if the quantity is a Measurement of a Physical quantity
+        # TODO LATER WE ASSUME IT IS A MEASUREMENT
+        assert isinstance(quantity,MeasurementQuantity)
+
+        # If this is already the right system just set the value to 1
+        if quantity.system == self:
+            return MeasurementQuantity(1,quantity.dimension,self)
+        # Otherwise first convert to the current system and then set the value to 1
+        else:
+            converted_quantity = quantity.to_system(self)
+            return MeasurementQuantity(1,converted_quantity.dimension,self)
 
 
 class MeasurementQuantity(PhysicalQuantity):
