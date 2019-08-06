@@ -13129,7 +13129,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">units.LTM</span> <span class="k">import</span> <span class="o">*</span>
@@ -13149,7 +13149,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># SI is the SI system for LTM, with the SI units as the quantites defining 1 unit</span>
@@ -13184,7 +13184,7 @@ kg = 1.000000e+00 kg^1 ([M]^1)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># We provide short-hands for practical purposes</span>
@@ -13220,7 +13220,7 @@ kg = 1.000000e+00 kg^1 ([M]^1)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># We can perform operations between units as you would expect</span>
@@ -13263,7 +13263,7 @@ kg = 1.000000e+00 kg^1 ([M]^1)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">GeV</span><span class="p">)</span>
@@ -13306,7 +13306,7 @@ hbar = 1.000000e+00 hbar^1 ([J]^1)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Convert 1m^2 to the HEP system</span>
@@ -13349,7 +13349,7 @@ hbar = 1.000000e+00 hbar^1 ([J]^1)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">GeV</span><span class="o">**-</span><span class="mi">1</span><span class="o">*</span><span class="n">c</span><span class="o">*</span><span class="n">hbar</span><span class="o">/</span><span class="n">m</span><span class="p">)</span>
@@ -13381,6 +13381,374 @@ hbar = 1.000000e+00 hbar^1 ([J]^1)
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Building-your-own-systems">Building your own systems<a class="anchor-link" href="#Building-your-own-systems">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="PhysicalSystem-and-MeasurementSystem">PhysicalSystem and MeasurementSystem<a class="anchor-link" href="#PhysicalSystem-and-MeasurementSystem">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are two main classes which define the framework in which quantities are measured:</p>
+<ul>
+<li><code>PhysicalSystem</code> embodies the abstract system of possible measurements. It relies on defining a list of abstract quantities and associated units but you should think of it as the abstract structure $\text{Dim}_D=\mathbb{K}\times D$ defined in the <a href="math.html">math</a> section.</li>
+<li><code>MeasurementSystem</code> is a specific choice of units within a given <code>PhysicalSystem</code>. It is defined by choosing a complete set of quantities which we will use as our new units. Choosing such a set corresponds to choosing a generating set of $\text{Dim}_D$ (<em>i.e.</em> a choice of basis for $D$ and a set of associated values in $\mathbb{K}$ as outlined in the <a href="math.html">math</a> section).</li>
+</ul>
+<p>In the example of the LTM system above, the <code>PhysicalSystem</code> should be thought of as the abstract set of quantities that can be built out of lengths, times and masses. We show two measurement systems: SI in which we measure these quantities as combinations of meters, seconds and kilograms, and HEP, in which we use instead GeV, c and hbar.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Building-a-PhysicalSystem">Building a PhysicalSystem<a class="anchor-link" href="#Building-a-PhysicalSystem">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">units.physical_system</span> <span class="k">as</span> <span class="nn">ps</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Defining a PhysicalSystem is done by providing a list of pairs of (quantity_name,unit_name) as:</span>
+<span class="c1"># The choice of units has no profound importance but is required to fix a reference</span>
+<span class="c1"># with respect to which all other units will be defined</span>
+<span class="n">mySystemDefinition</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;Length&quot;</span><span class="p">,</span><span class="s2">&quot;yards&quot;</span><span class="p">),(</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span><span class="s2">&quot;(four scores and seven years)&quot;</span><span class="p">),(</span><span class="s2">&quot;Mass&quot;</span><span class="p">,</span><span class="s2">&quot;stones&quot;</span><span class="p">))</span>
+<span class="n">LTM_better_units</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PhysicalSystem</span><span class="p">(</span><span class="n">mySystemDefinition</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can obtain some information on our physical system</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">LTM_better_units</span><span class="o">.</span><span class="n">quantity_definitions</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">LTM_better_units</span><span class="o">.</span><span class="n">base_quantities</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[(&#39;Length&#39;, &#39;yards&#39;), (&#39;Time&#39;, &#39;four scores and seven years&#39;), (&#39;Mass&#39;, &#39;stones&#39;)]
+1.000000e+00 yards^1 ([Length]^1)
+1.000000e+00 four scores and seven years^1 ([Time]^1)
+1.000000e+00 stones^1 ([Mass]^1)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The base_quantities are <code>PhysicalQuantity</code> objects which can be manipulated as one would expect. However it is better to define a <code>MeasurementSystem</code> and get <code>MeasurementQuantity</code> objects as these allow seamless system changes. The <code>PhysicalSystem</code> is there only to provide a reference point.</p>
+<p>We can obtain a trivial <code>MeasurementSystem</code></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">units.measurement_system</span> <span class="k">as</span> <span class="nn">ms</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imperial</span><span class="o">=</span><span class="n">ms</span><span class="o">.</span><span class="n">physical_measurement_system</span><span class="p">(</span><span class="n">LTM_better_units</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">imperial</span><span class="o">.</span><span class="n">quantity_definitions</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">imperial</span><span class="o">.</span><span class="n">base_quantities</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="p">(</span><span class="n">yards</span><span class="p">,</span><span class="n">lincolntime</span><span class="p">,</span><span class="n">stones</span><span class="p">)</span> <span class="o">=</span> <span class="n">imperial</span><span class="o">.</span><span class="n">base_quantities</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[(&#39;Length&#39;, &#39;yards&#39;), (&#39;Time&#39;, &#39;(four scores and seven years)&#39;), (&#39;Mass&#39;, &#39;stones&#39;)]
+yards = 1.000000e+00 yards^1 ([Length]^1)
+(four scores and seven years) = 1.000000e+00 (four scores and seven years)^1 ([Time]^1)
+stones = 1.000000e+00 stones^1 ([Mass]^1)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If for some reason a crazy user wanted to use a different unit system to measure the same quantities, one first defines a complete set of units</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">meter</span> <span class="o">=</span> <span class="mf">1.09361</span><span class="o">*</span><span class="n">yards</span>
+<span class="n">second</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mi">2743632000</span><span class="p">))</span><span class="o">*</span><span class="n">lincolntime</span>
+<span class="n">kilogram</span> <span class="o">=</span> <span class="mf">0.157473</span><span class="o">*</span><span class="n">stones</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We must name these quantities (the dimension) and the unit. Having a <code>MeasurementQuantity</code> object ensures that the new system will be generated with the same underlying <code>PhysicalSystem</code></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">crazy_system_def</span> <span class="o">=</span> <span class="p">(</span>
+<span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">,</span><span class="s2">&quot;meter&quot;</span><span class="p">,</span><span class="n">meter</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span><span class="s2">&quot;second&quot;</span><span class="p">,</span><span class="n">second</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="s2">&quot;kilogram&quot;</span><span class="p">,</span><span class="n">kilogram</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">crazy_system</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">MeasurementSystem</span><span class="p">(</span><span class="n">crazy_system_def</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">one_year</span> <span class="o">=</span> <span class="mi">31536000</span><span class="o">*</span><span class="n">second</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lincolntime</span><span class="o">/</span><span class="n">one_year</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>8.700000e+01 ()
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That is indeed four scores and seven years</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As illustrated by the HEP system above, we do not need to use just a change of unit by rescaling them, but we can change which elementeray physical quantities to use for our base units (say energy instead of mass).
+This is quite practical for physics since we often like to "set some quantities to 1", which simply means using them as a base unit.
+For example we can use a subset of atomic units to describe our system</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[53]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">pi</span>
+<span class="n">me</span> <span class="o">=</span> <span class="mf">9.10938356e-31</span><span class="o">*</span><span class="n">kilogram</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">6.62607015e-34</span><span class="o">*</span><span class="n">kilogram</span><span class="o">*</span><span class="n">meter</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">second</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span><span class="o">*</span><span class="n">meter</span><span class="o">/</span><span class="n">second</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="mi">137</span>
+
+<span class="n">atomic_unit_def</span> <span class="o">=</span> <span class="p">(</span>
+<span class="p">(</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="s2">&quot;me&quot;</span><span class="p">,</span><span class="n">me</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;J&quot;</span><span class="p">,</span><span class="s2">&quot;hbar&quot;</span><span class="p">,</span><span class="n">h</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">pi</span><span class="p">)),</span>
+<span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span><span class="s2">&quot;(alpha*c)&quot;</span><span class="p">,</span><span class="n">alpha</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">atomic_units</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">MeasurementSystem</span><span class="p">(</span><span class="n">atomic_unit_def</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[54]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atomic_units</span><span class="o">.</span><span class="n">base_quantities</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[54]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;MeasurementQuantity 1.000000e+00 me^1&gt;,
+ &lt;MeasurementQuantity 1.000000e+00 hbar^1&gt;,
+ &lt;MeasurementQuantity 1.000000e+00 (alpha*c)^1&gt;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[55]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atomic_units</span><span class="p">(</span><span class="n">meter</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[55]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;MeasurementQuantity 1.890223e+10 me^-1 hbar^1 (alpha*c)^-1&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And indeed $$\left[\frac{\hbar}{\alpha c m_e }\right]=[D]$$</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>
