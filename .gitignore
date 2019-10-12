@@ -1,4 +1,3 @@
-py-units-venv
-units/__pycache__
-Untitled.ipynb
-Untitled-checkpoint.ipynb
+*__pycache__*
+*ipynb
+*pyc
